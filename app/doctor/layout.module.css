@@ -1,0 +1,105 @@
+.layout {
+  min-height: 100vh;
+  background: var(--gray-50);
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.headerInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.logo {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--primary-600);
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--gray-500);
+  text-decoration: none;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.navLink:hover {
+  color: var(--gray-900);
+  background: var(--gray-100);
+}
+
+.navLinkActive {
+  color: var(--primary-700);
+  background: var(--primary-50);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.profileLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--gray-600);
+  text-decoration: none;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast);
+}
+
+.profileLink:hover {
+  color: var(--gray-900);
+  background: var(--gray-100);
+}
+
+.logoutButton {
+  color: var(--gray-400);
+  padding: var(--space-2);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast);
+}
+
+.logoutButton:hover {
+  color: var(--red-600);
+  background: var(--red-50);
+}
+
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6) var(--space-16);
+}

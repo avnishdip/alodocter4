@@ -1,0 +1,319 @@
+.page {
+  padding: var(--space-8) 0;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.pageTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+}
+
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--primary-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.btnPrimary:hover {
+  background: var(--primary-600);
+}
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--gray-100);
+  background: var(--gray-50);
+}
+
+.table td {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--gray-100);
+  font-size: var(--text-sm);
+  color: var(--gray-900);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: var(--gray-50);
+}
+
+.amount {
+  font-weight: var(--font-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.badgePending { background: var(--amber-50); color: var(--amber-600); }
+.badgePaid { background: var(--green-50); color: var(--green-600); }
+.badgeCancelled { background: var(--red-50); color: var(--red-600); }
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.btnAction {
+  padding: var(--space-1) var(--space-2);
+  background: none;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--gray-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.btnAction:hover {
+  border-color: var(--primary-500);
+  color: var(--primary-600);
+}
+
+/* Modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modalTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-5);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--gray-900);
+}
+
+.input, .select, .textarea {
+  padding: var(--space-3);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.btnSecondary {
+  padding: var(--space-3) var(--space-6);
+  background: var(--gray-100);
+  color: var(--gray-900);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.btnSecondary:hover {
+  background: var(--gray-200);
+}
+
+.empty {
+  text-align: center;
+  color: var(--gray-400);
+  font-size: var(--text-sm);
+  padding: var(--space-10);
+}
+
+.loading {
+  text-align: center;
+  color: var(--gray-500);
+  padding: var(--space-10) 0;
+  font-size: var(--text-sm);
+}
+
+.error {
+  text-align: center;
+  color: var(--red-600);
+  padding: var(--space-6) 0;
+  font-size: var(--text-sm);
+}
+
+.formError {
+  color: var(--red-600);
+  font-size: var(--text-sm);
+}
+
+/* Print styles */
+.printContainer {
+  display: none;
+}
+
+@media print {
+  .hideForPrint {
+    display: none !important;
+  }
+  
+  .printContainer {
+    display: block;
+    padding: 2rem;
+    color: #000;
+    font-family: var(--font-sans);
+  }
+
+  .printHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #000;
+    padding-bottom: 1rem;
+  }
+
+  .printClinicName {
+    font-size: 24pt;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .printTitle {
+    font-size: 20pt;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+  }
+
+  .printText {
+    font-size: 11pt;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+  }
+
+  .printSectionTitle {
+    font-size: 12pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: #555;
+  }
+
+  .printBillTo {
+    margin-bottom: 2rem;
+  }
+
+  .printTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+
+  .printTable th {
+    text-align: left;
+    border-bottom: 1px solid #000;
+    padding: 0.5rem 0;
+    font-weight: bold;
+  }
+
+  .printTable td {
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .printTotal {
+    text-align: right;
+    font-size: 14pt;
+    border-top: 2px solid #000;
+    padding-top: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .printNotes {
+    font-size: 10pt;
+    color: #444;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+  }
+}

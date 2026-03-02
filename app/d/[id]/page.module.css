@@ -1,0 +1,212 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--gray-50);
+}
+
+.header {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.headerInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--gray-600);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+  transition: color var(--duration-fast);
+}
+
+.backLink:hover {
+  color: var(--gray-900);
+}
+
+.logo {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--primary-600);
+  text-decoration: none;
+}
+
+.main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+}
+
+.avatarLarge {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-full);
+  background: var(--primary-50);
+  color: var(--primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: var(--text-3xl);
+  border: 1px solid var(--primary-100);
+}
+
+.name {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-2);
+}
+
+.specialty {
+  font-size: var(--text-lg);
+  color: var(--primary-600);
+  font-weight: var(--font-medium);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-8);
+}
+
+.section {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.sectionTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-4);
+}
+
+.bio {
+  color: var(--gray-600);
+  line-height: var(--leading-relaxed);
+  white-space: pre-wrap;
+}
+
+.fee {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+}
+
+.bookingCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--primary-200);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: var(--space-6);
+}
+
+.bookingTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-6);
+}
+
+.availabilityList {
+  margin-bottom: var(--space-6);
+}
+
+.availHeader {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+  margin-bottom: var(--space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-semibold);
+}
+
+.availRow {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: var(--text-sm);
+}
+
+.availRow:last-child {
+  border-bottom: none;
+}
+
+.availDay {
+  color: var(--gray-900);
+  font-weight: var(--font-medium);
+}
+
+.availTime {
+  color: var(--gray-600);
+}
+
+.noAvail {
+  color: var(--gray-500);
+  font-style: italic;
+  font-size: var(--text-sm);
+}
+
+.bookButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--primary-500);
+  color: var(--white);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.bookButton:hover {
+  background-color: var(--primary-600);
+}
+
+.loginHint {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--gray-500);
+  margin-top: var(--space-3);
+}
+
+.loading, .error {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  color: var(--gray-600);
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

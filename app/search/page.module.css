@@ -1,0 +1,215 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--gray-50);
+}
+
+.header {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.headerInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--primary-600);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.loginLink {
+  color: var(--gray-600);
+  font-weight: var(--font-semibold);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.loginLink:hover {
+  color: var(--primary-600);
+}
+
+.main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+}
+
+.searchSection {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  color: var(--gray-500);
+  margin-bottom: var(--space-8);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.searchBar {
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-5);
+  color: var(--gray-400);
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-5) var(--space-5) var(--space-5) 3.5rem;
+  font-size: var(--text-base);
+  background-color: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.searchInput:hover {
+  border-color: var(--gray-300);
+  box-shadow: var(--shadow-md);
+}
+
+.searchInput:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 4px var(--primary-100);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-6);
+}
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  padding: var(--space-8);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--duration-normal) var(--ease-default);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  border-color: var(--primary-300);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--primary-50);
+  color: var(--primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: var(--text-xl);
+  border: 1px solid var(--primary-100);
+}
+
+.docName {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+
+.docSpecialty {
+  font-size: var(--text-sm);
+  color: var(--primary-600);
+  font-weight: var(--font-semibold);
+}
+
+.cardBody {
+  flex: 1;
+  border-top: 1px solid var(--gray-100);
+  padding-top: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-2);
+}
+
+.infoLabel {
+  color: var(--gray-500);
+}
+
+.infoValue {
+  color: var(--gray-900);
+  font-weight: 700;
+  font-size: var(--text-base);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--primary-600);
+  font-weight: var(--font-bold);
+  font-size: var(--text-sm);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--gray-100);
+  transition: gap var(--duration-fast);
+}
+
+.card:hover .cardFooter {
+  gap: var(--space-3);
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: var(--space-16);
+  color: var(--gray-500);
+  font-size: var(--text-lg);
+}

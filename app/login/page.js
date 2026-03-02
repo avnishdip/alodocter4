@@ -1,31 +1,182 @@
-import { login } from "@/app/actions/auth";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuthStore } from "@/lib/stores/authStore";
+import styles from "./login.module.css";
 
 export default function LoginPage() {
+  const router = useRouter();
+  
+  const { loginDoctor, requestOTP, verifyOTP } = useAuthStore();
+  const [activeTab, setActiveTab] = useState("doctor");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState(null);
+
+  // Safely extract search params after hydration to avoid Next.js Suspense issues
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirect = urlParams.get("redirect");
+      if (redirect) {
+        setRedirectUrl(redirect);
+        if (redirect.includes("patient")) {
+          setActiveTab("patient");
+        }
+      }
+    }
+  }, []);
+
+  // Doctor form
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Patient form
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+
+  const handleDoctorLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await loginDoctor(email, password);
+      router.push(redirectUrl || "/doctor/dashboard");
+    } catch (err) {
+      setError(err.message || "Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequestOTP = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await requestOTP(phone);
+      setOtpSent(true);
+    } catch (err) {
+      setError(err.message || "Failed to send code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await verifyOTP(phone, otp);
+      router.push(redirectUrl || "/patient/home");
+    } catch (err) {
+      setError(err.message || "Invalid code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <h1 className={styles.logo}>Alo Doctor</h1>
+          <p className={styles.subtitle}>Secure Access Portal</p>
         </div>
-        <form className="mt-8 space-y-6" action={login}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input id="email" name="email" type="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Email address" />
+
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${activeTab === "doctor" ? styles.tabActive : ""}`}
+            onClick={() => { setActiveTab("doctor"); setError(""); }}
+          >
+            Healthcare Provider
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === "patient" ? styles.tabActive : ""}`}
+            onClick={() => { setActiveTab("patient"); setError(""); }}
+          >
+            Patient Access
+          </button>
+        </div>
+
+        {error && <div className={styles.error}>{error}</div>}
+
+        {activeTab === "doctor" ? (
+          <form onSubmit={handleDoctorLogin} className={styles.form}>
+            <div className={styles.field}>
+              <label className={styles.label}>Work Email</label>
+              <input
+                type="email"
+                className={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="dr.name@clinic.mu"
+                required
+              />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input id="password" name="password" type="password" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Password" />
+            <div className={styles.field}>
+              <label className={styles.label}>Password</label>
+              <input
+                type="password"
+                className={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter secure password"
+                required
+              />
             </div>
-          </div>
-          <div>
-            <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Sign in
+            <button type="submit" className={styles.button} disabled={loading}>
+              {loading ? "Authenticating..." : "Sign In to Workspace"}
             </button>
-          </div>
-        </form>
+          </form>
+        ) : (
+          !otpSent ? (
+            <form onSubmit={handleRequestOTP} className={styles.form}>
+              <div className={styles.field}>
+                <label className={styles.label}>Phone Number</label>
+                <input
+                  type="tel"
+                  className={styles.input}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="5XXX XXXX"
+                  required
+                />
+              </div>
+              <button type="submit" className={styles.button} disabled={loading}>
+                {loading ? "Sending Code..." : "Send Login Code"}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOTP} className={styles.form}>
+              <div className={styles.field}>
+                <label className={styles.label}>Enter Code sent to {phone}</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="6-digit code"
+                  required
+                />
+              </div>
+              <button type="submit" className={styles.button} disabled={loading}>
+                {loading ? "Verifying..." : "Verify & Sign In"}
+              </button>
+            </form>
+          )
+        )}
+
+        <div className={styles.footer}>
+          <p>
+            New practitioner?{" "}
+            <Link href="/onboarding" className={styles.link}>Request Platform Access</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

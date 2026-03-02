@@ -1,0 +1,205 @@
+.page {
+  padding: var(--space-8) 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--gray-100);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--gray-900);
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.backButton:hover {
+  background: var(--gray-200);
+}
+
+.pageTitle {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+}
+
+/* Step indicator */
+.stepLabel {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+  margin-bottom: var(--space-2);
+  font-weight: var(--font-medium);
+}
+
+/* Day selector */
+.daySelector {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-5);
+  -webkit-overflow-scrolling: touch;
+}
+
+.dayCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  padding: var(--space-3) var(--space-2);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.dayCard:hover {
+  border-color: var(--primary-500);
+  background: var(--primary-50);
+}
+
+.dayCardSelected {
+  border-color: var(--primary-500);
+  background: var(--primary-500);
+  color: white;
+}
+
+.dayCardSelected .dayName,
+.dayCardSelected .dayNumber,
+.dayCardSelected .dayMonth {
+  color: white;
+}
+
+.dayName {
+  font-size: var(--text-xs);
+  color: var(--gray-400);
+  font-weight: var(--font-medium);
+  margin-bottom: 2px;
+}
+
+.dayNumber {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+}
+
+.dayMonth {
+  font-size: var(--text-xs);
+  color: var(--gray-400);
+}
+
+/* Time slots */
+.slotGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.slot {
+  padding: var(--space-3);
+  text-align: center;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  background: var(--white);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.slot:hover {
+  border-color: var(--primary-500);
+  background: var(--primary-50);
+}
+
+.slotSelected {
+  border-color: var(--primary-500);
+  background: var(--primary-500);
+  color: white;
+}
+
+/* Confirmation */
+.confirmCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+}
+
+.confirmTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-3);
+}
+
+.confirmRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  font-size: var(--text-base);
+  color: var(--gray-900);
+}
+
+.confirmLabel {
+  color: var(--gray-400);
+  font-size: var(--text-sm);
+  min-width: 50px;
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: var(--space-3) var(--space-6);
+  background: var(--primary-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  min-height: 48px;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.btnPrimary:hover {
+  background: var(--primary-600);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-6) 0;
+  color: var(--gray-400);
+  font-size: var(--text-sm);
+}
+
+.error {
+  text-align: center;
+  padding: var(--space-3);
+  background: var(--red-50);
+  color: var(--red-600);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+}
