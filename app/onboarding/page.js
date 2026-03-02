@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { api } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import styles from "./onboarding.module.css";
 
 const SPECIALTIES = [
@@ -23,6 +24,19 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is already authenticated (e.g. returning from email verification)
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+        setStep(2); // Skip account creation and go straight to practice details
+      }
+    };
+    checkAuth();
+  }, []);
 
   // Step 1: Account
   const [email, setEmail] = useState("");
@@ -153,7 +167,7 @@ export default function OnboardingPage() {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        {step === 1 && (
+        {step === 1 && !isAuthenticated && (
           <form onSubmit={handleRegister} className={styles.form}>
             <h2 className={styles.stepTitle}>Create your account</h2>
             <div className={styles.row}>
