@@ -58,7 +58,7 @@ export async function signup(formData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/verification-complete");
+  return { success: true };
 }
 
 export async function signout() {

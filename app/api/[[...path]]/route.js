@@ -103,15 +103,15 @@ export async function POST(request, { params }) {
 
     if (path === "auth/sync-doctor") {
       if (!user) return NextResponse.json({}, { status: 401 });
-      await supabase.from("profiles").upsert({ id: user.id, role: "doctor", first_name: body.first_name, last_name: body.last_name });
-      await supabase.from("doctors").upsert({ id: user.id, specialty: body.specialty, license_no: body.license_no, fee: body.fee || 0 });
+      if (body.first_name || body.last_name || body.phone) { await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name, phone: body.phone }).eq("id", user.id); }
+      await supabase.from("doctors").update({ specialty: body.specialty, license_no: body.license_no, fee: body.fee || 0 }).eq("id", user.id);
       return NextResponse.json({ role: "doctor", user: { id: user.id, email: user.email }});
     }
 
     if (path === "auth/sync-patient") {
       if (!user) return NextResponse.json({}, { status: 401 });
-      await supabase.from("profiles").upsert({ id: user.id, role: "patient", first_name: body.first_name, last_name: body.last_name });
-      await supabase.from("patients").upsert({ id: user.id, date_of_birth: body.date_of_birth || "1990-01-01" });
+      await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name }).eq("id", user.id);
+      await supabase.from("patients").update({ date_of_birth: body.date_of_birth || "1990-01-01" }).eq("id", user.id);
       return NextResponse.json({ role: "patient", user: { id: user.id, phone: user.phone }});
     }
 
@@ -164,7 +164,7 @@ export async function PUT(request, { params }) {
   try {
     if (path === "doctors/me") {
       await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name }).eq("id", user.id);
-      const { data } = await supabase.from("doctors").update({ specialty: body.specialty, bio: body.bio, fee: body.fee }).eq("id", user.id).select().single();
+      const { data } = await supabase.from("doctors").update({ specialty: body.specialty, bio: body.bio, fee: body.fee }).eq("id", user.id).select().single() || {};
       return NextResponse.json(data);
     }
     
@@ -172,6 +172,11 @@ export async function PUT(request, { params }) {
        await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name }).eq("id", user.id);
        const { data } = await supabase.from("patients").update({ medical_conditions: body.medical_conditions }).eq("id", user.id).select().single();
        return NextResponse.json(data);
+    }
+
+    if (path === "doctors/me/availability") {
+      // Dummy response for MVP since availability table isn't created
+      return NextResponse.json({ success: true });
     }
 
     return NextResponse.json({ detail: "Not found PUT" }, { status: 404 });

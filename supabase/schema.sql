@@ -100,7 +100,7 @@ BEGIN
     COALESCE(new.raw_user_meta_data->>'last_name', '')
   );
   
-  IF new.raw_user_meta_data->>'role' = 'doctor' THEN
+  IF COALESCE(new.raw_user_meta_data->>'role', 'patient') = 'doctor' THEN
     INSERT INTO public.doctors (id, specialty, license_no, fee)
     VALUES (
       new.id,
@@ -108,6 +108,9 @@ BEGIN
       COALESCE(new.raw_user_meta_data->>'license_no', 'PENDING'),
       COALESCE((new.raw_user_meta_data->>'fee')::int, 0)
     );
+  ELSE
+    INSERT INTO public.patients (id, date_of_birth)
+    VALUES (new.id, '1990-01-01');
   END IF;
 
   RETURN new;
