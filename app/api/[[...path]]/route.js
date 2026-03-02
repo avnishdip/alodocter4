@@ -22,7 +22,9 @@ export async function GET(request, { params }) {
     }
 
     if (path.startsWith("doctors/public/") && path.endsWith("/availability")) {
-      return NextResponse.json([{ day_of_week: 1, start_time: "09:00", end_time: "17:00" }]);
+      const id = pathArray[2];
+      const { data } = await supabase.from("availability").select("*").eq("doctor_id", id);
+      return NextResponse.json(data || []);
     }
 
     if (path === "auth/me") {
@@ -44,9 +46,13 @@ export async function GET(request, { params }) {
       return NextResponse.json({ ...data, ...data?.profiles });
     }
 
+
     if (path === "patients" || path === "patients/") {
       const { data } = await supabase.from("doctor_patients").select("patients(*, profiles(*))").eq("doctor_id", user.id);
-      return NextResponse.json(data?.map(d => ({ ...d.patients, ...d.patients?.profiles })) || []);
+      const { data: invites } = await supabase.from("pending_invites").select("*").eq("doctor_id", user.id);
+      const active = data?.map(d => ({ ...d.patients, ...d.patients?.profiles, status: "active" })) || [];
+      const pending = invites?.map(i => ({ id: i.id, first_name: i.first_name, last_name: i.last_name, phone: i.phone, status: "invited" })) || [];
+      return NextResponse.json([...active, ...pending]);
     }
 
     if (path.startsWith("patients/") && pathArray.length === 2 && pathArray[1] !== "me") {
@@ -54,23 +60,83 @@ export async function GET(request, { params }) {
       return NextResponse.json({ ...data, ...data?.profiles });
     }
 
+
     if (path === "appointments" || path === "appointments/") {
       const { data } = await supabase.from("appointments").select("*, doctors(profiles(*)), patients(profiles(*))").or(`doctor_id.eq.${user.id},patient_id.eq.${user.id}`);
+
       return NextResponse.json(data?.map(d => ({
         ...d,
+        datetime: `${d.date}T${d.start_time}`,
         doctor: d.doctors ? { ...d.doctors, ...d.doctors.profiles } : null,
         patient: d.patients ? { ...d.patients, ...d.patients.profiles } : null
       })) || []);
+
+    }
+
+    if (path === "appointments/available-slots") {
+      const searchParams = request.nextUrl.searchParams;
+      const doctorId = searchParams.get("doctor_id");
+      const dateStr = searchParams.get("date");
+      if (!doctorId || !dateStr) return NextResponse.json({ slots: [] });
+
+      const dateObj = new Date(dateStr);
+      const dayOfWeek = dateObj.getDay(); // 0 is Sunday, 1 is Monday
+      
+      // Fetch availability for that day
+      const { data: avail } = await supabase.from("availability").select("*").eq("doctor_id", doctorId).eq("day_of_week", dayOfWeek).single();
+      
+      if (!avail) return NextResponse.json({ slots: [] });
+      
+      // Fetch existing appointments
+      const { data: appointments } = await supabase.from("appointments").select("start_time, end_time").eq("doctor_id", doctorId).eq("date", dateStr).neq("status", "cancelled");
+      
+      // Generate slots
+      const slots = [];
+      let currentString = avail.start_time; // e.g. "09:00:00"
+      const endString = avail.end_time;
+      const duration = avail.slot_duration || 30;
+      
+      const parseTime = (t) => {
+        const [h, m] = t.split(':');
+        return parseInt(h, 10) * 60 + parseInt(m, 10);
+      };
+      const formatTime = (mins) => {
+        const h = Math.floor(mins / 60).toString().padStart(2, '0');
+        const m = (mins % 60).toString().padStart(2, '0');
+        return `${h}:${m}`;
+      };
+
+      let currentMins = parseTime(currentString);
+      const endMins = parseTime(endString);
+      
+      const bookedSet = new Set(appointments?.map(a => formatTime(parseTime(a.start_time))) || []);
+
+      while (currentMins + duration <= endMins) {
+        const slotStr = formatTime(currentMins);
+        if (!bookedSet.has(slotStr)) {
+          slots.push(slotStr);
+        }
+        currentMins += duration;
+      }
+      
+      return NextResponse.json({ slots });
+    }
+
+
+
+    if (path === "medications/logs") {
+      const { data } = await supabase.from("medication_logs").select("*").eq("patient_id", user.id);
+      return NextResponse.json(data || []);
     }
 
     if (path === "medications/plans") {
       const { data } = await supabase.from("medication_plans").select("*").or(`doctor_id.eq.${user.id},patient_id.eq.${user.id}`);
-      return NextResponse.json(data || []);
+      return NextResponse.json(data?.map(p => ({...p, times: p.schedule, active: p.is_active, medication_name: p.name})) || []);
     }
 
     if (path.startsWith("medications/plans/patient/")) {
       const { data } = await supabase.from("medication_plans").select("*").eq("patient_id", pathArray[3]);
-      return NextResponse.json(data || []);
+      return NextResponse.json(data?.map(p => ({...p, times: p.schedule, active: p.is_active, medication_name: p.name})) || []);
     }
 
     if (path.startsWith("medications/compliance/")) {
@@ -78,11 +144,13 @@ export async function GET(request, { params }) {
     }
 
     if (path === "invoices" || path === "invoices/") {
-      return NextResponse.json([]);
+      const { data } = await supabase.from("invoices").select("*, patients(profiles(first_name, last_name)), doctors(profiles(first_name, last_name))").or(`doctor_id.eq.${user.id},patient_id.eq.${user.id}`);
+      return NextResponse.json(data?.map(i => ({...i, patient_name: i.patients?.profiles?.first_name + ' ' + i.patients?.profiles?.last_name, doctor_name: i.doctors?.profiles?.first_name + ' ' + i.doctors?.profiles?.last_name})) || []);
     }
 
     if (path === "doctors/me/availability") {
-      return NextResponse.json([]);
+      const { data } = await supabase.from("availability").select("*").eq("doctor_id", user.id);
+      return NextResponse.json(data || []);
     }
 
     return NextResponse.json({ detail: "Not found: " + path }, { status: 404 });
@@ -108,6 +176,23 @@ export async function POST(request, { params }) {
       return NextResponse.json({ role: "doctor", user: { id: user.id, email: user.email }});
     }
 
+
+    if (path === "patients/invite") {
+      const token = Math.random().toString(36).substring(2, 10);
+      let p_phone = body.phone.startsWith("+") ? body.phone : `+230${body.phone}`;
+      const { data, error } = await supabase.from("pending_invites").upsert({
+        doctor_id: user.id,
+        phone: p_phone,
+        first_name: body.first_name,
+        last_name: body.last_name,
+        conditions: body.conditions ? body.conditions.join(", ") : "",
+        token: token
+      }).select().single();
+      if (error) throw error;
+      // Send them to the normal login screen instead of the old legacy PIN screen
+      return NextResponse.json({ invite_link: `https://${request.headers.get("host")}/login?redirect=patient` });
+    }
+
     if (path === "auth/sync-patient") {
       if (!user) return NextResponse.json({}, { status: 401 });
       await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name }).eq("id", user.id);
@@ -117,16 +202,38 @@ export async function POST(request, { params }) {
 
     if (!user) return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
 
-    if (path === "appointments") {
+
+    if (path === "appointments" || path === "appointments/") {
+      let date = body.date;
+      let start_time = body.start_time;
+      let end_time = body.end_time;
+      
+      // Handle the case where frontend sends 'datetime'
+      if (body.datetime) {
+         const dt = new Date(body.datetime);
+         date = dt.toISOString().split("T")[0];
+         start_time = dt.toISOString().split("T")[1].substring(0, 5); // 'HH:MM' in UTC
+         // wait, timezone matters. The frontend sends local time. 
+         // Actually, the simplest is just extract from ISO if we want UTC, or use dt.getHours()
+         const hh = dt.getHours().toString().padStart(2, '0');
+         const mm = dt.getMinutes().toString().padStart(2, '0');
+         start_time = `${hh}:${mm}`;
+         dt.setMinutes(dt.getMinutes() + 30);
+         const ehh = dt.getHours().toString().padStart(2, '0');
+         const emm = dt.getMinutes().toString().padStart(2, '0');
+         end_time = `${ehh}:${emm}`;
+      }
+
       const { data, error } = await supabase.from("appointments").insert({
         doctor_id: body.doctor_id || user.id,
         patient_id: body.patient_id || user.id,
-        date: body.date,
-        start_time: body.start_time,
-        end_time: body.end_time || body.start_time,
+        date: date,
+        start_time: start_time,
+        end_time: end_time || start_time,
         type: body.type || 'consultation',
         notes: body.notes
       }).select().single();
+
       if (error) throw error;
       return NextResponse.json(data);
     }
@@ -138,9 +245,22 @@ export async function POST(request, { params }) {
         name: body.name,
         dosage: body.dosage,
         frequency: body.frequency,
-        times_per_day: body.times_per_day || 1,
-        schedule: body.schedule || {},
+        times_per_day: body.times?.length || body.times_per_day || 1,
+        schedule: body.times || body.schedule || {},
         start_date: body.start_date || new Date().toISOString()
+      }).select().single();
+      if (error) throw error;
+      return NextResponse.json(data);
+    }
+
+
+    if (path === "medications/logs") {
+      const { data, error } = await supabase.from("medication_logs").insert({
+        plan_id: body.plan_id,
+        patient_id: user.id,
+        scheduled_time: body.scheduled_at,
+        taken_at: body.status === 'taken' ? new Date().toISOString() : null,
+        status: body.status
       }).select().single();
       if (error) throw error;
       return NextResponse.json(data);
@@ -175,7 +295,12 @@ export async function PUT(request, { params }) {
     }
 
     if (path === "doctors/me/availability") {
-      // Dummy response for MVP since availability table isn't created
+      // Upsert availability
+      await supabase.from("availability").delete().eq("doctor_id", user.id);
+      if (body && body.length > 0) {
+        const slots = body.map(s => ({...s, doctor_id: user.id}));
+        await supabase.from("availability").insert(slots);
+      }
       return NextResponse.json({ success: true });
     }
 

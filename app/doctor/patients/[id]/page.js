@@ -131,7 +131,7 @@ export default function PatientDetailPage({ params }) {
       setPlanFormError(null);
       await api.post("/medications/plans", {
         patient_id: patientId,
-        medication_name: planForm.medication_name.trim(),
+        name: planForm.medication_name.trim(),
         dosage: planForm.dosage.trim(),
         frequency: planForm.frequency,
         times: planForm.times,

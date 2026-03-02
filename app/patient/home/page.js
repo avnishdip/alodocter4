@@ -38,6 +38,7 @@ function formatDateTime(dateStr) {
 export default function HomePage() {
   const { user } = useAuthStore();
   const [plans, setPlans] = useState([]);
+  const [logsMap, setLogsMap] = useState({});
   const [nextAppointment, setNextAppointment] = useState(null);
   const [loggedDoses, setLoggedDoses] = useState({});
   const [loading, setLoading] = useState(true);
@@ -50,12 +51,26 @@ export default function HomePage() {
     try {
       setLoading(true);
 
-      const [plansData, appointmentsData] = await Promise.all([
+      const [plansData, appointmentsData, logsData] = await Promise.all([
         api.get("/medications/plans").catch(() => []),
         api.get("/appointments/").catch(() => []),
+        api.get("/medications/logs").catch(() => [])
       ]);
 
       setPlans(Array.isArray(plansData) ? plansData : []);
+      // Map today's logs so we can cross out taken meds
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todayLogs = (Array.isArray(logsData) ? logsData : []).filter(l => l.scheduled_time && l.scheduled_time.startsWith(todayStr));
+      const logMap = {};
+      todayLogs.forEach(l => {
+         // Assuming schedule format has the time
+         const dt = new Date(l.scheduled_time);
+         const hh = dt.getHours().toString().padStart(2, '0');
+         const mm = dt.getMinutes().toString().padStart(2, '0');
+         const timeKey = `${hh}:${mm}`;
+         logMap[`${l.plan_id}-${timeKey}`] = l.status;
+      });
+      setLogsMap(logMap);
 
       // Find nearest upcoming appointment
       const now = new Date();
@@ -191,7 +206,7 @@ export default function HomePage() {
           </div>
         ) : (
           todaysDoses.map((dose) => (
-            <div key={dose.key} className={styles.medItem}>
+            <div key={dose.key} className={styles.medItem} style={{ opacity: logsMap[dose.planId + '-' + dose.time] ? 0.5 : 1 }}>
               <div className={styles.medInfo}>
                 <div className={styles.medTime}>
                   <Clock size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />

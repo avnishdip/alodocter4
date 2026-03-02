@@ -88,16 +88,64 @@ CREATE TABLE medication_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+
+-- 8. Availability Table
+CREATE TABLE IF NOT EXISTS availability (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  doctor_id UUID NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+  day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  slot_duration INTEGER NOT NULL DEFAULT 30,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(doctor_id, day_of_week)
+);
+
+-- 9. Invoices Table
+CREATE TABLE IF NOT EXISTS invoices (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  doctor_id UUID NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+  patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+  appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+  amount INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'cancelled')),
+  issued_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  due_date DATE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Function to handle new user signups via Supabase Auth
+
+-- 10. Pending Invites
+CREATE TABLE IF NOT EXISTS pending_invites (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  doctor_id UUID NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+  phone TEXT NOT NULL,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  conditions TEXT,
+  token TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(doctor_id, phone)
+);
+ALTER TABLE pending_invites ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Doctors can manage invites" ON pending_invites FOR ALL USING (auth.uid() = doctor_id);
+
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS $
+DECLARE
+  invite_record RECORD;
 BEGIN
-  INSERT INTO public.profiles (id, role, first_name, last_name)
+  -- Check if this phone number was invited
+  SELECT * INTO invite_record FROM public.pending_invites WHERE phone = new.phone LIMIT 1;
+
+  INSERT INTO public.profiles (id, role, first_name, last_name, phone)
   VALUES (
     new.id, 
     COALESCE(new.raw_user_meta_data->>'role', 'patient'), 
-    COALESCE(new.raw_user_meta_data->>'first_name', ''), 
-    COALESCE(new.raw_user_meta_data->>'last_name', '')
+    COALESCE(new.raw_user_meta_data->>'first_name', COALESCE(invite_record.first_name, '')), 
+    COALESCE(new.raw_user_meta_data->>'last_name', COALESCE(invite_record.last_name, '')),
+    new.phone
   );
   
   IF COALESCE(new.raw_user_meta_data->>'role', 'patient') = 'doctor' THEN
@@ -109,15 +157,19 @@ BEGIN
       COALESCE((new.raw_user_meta_data->>'fee')::int, 0)
     );
   ELSE
-    INSERT INTO public.patients (id, date_of_birth)
-    VALUES (new.id, '1990-01-01');
+    INSERT INTO public.patients (id, date_of_birth, medical_conditions)
+    VALUES (new.id, '1990-01-01', COALESCE(invite_record.conditions, ''));
+
+    IF invite_record.doctor_id IS NOT NULL THEN
+      INSERT INTO public.doctor_patients (doctor_id, patient_id) VALUES (invite_record.doctor_id, new.id);
+      DELETE FROM public.pending_invites WHERE id = invite_record.id;
+    END IF;
   END IF;
 
   RETURN new;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to call the function on signup
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -163,3 +215,16 @@ CREATE POLICY "Doctors can create meds" ON medication_plans FOR INSERT WITH CHEC
 CREATE POLICY "View own logs" ON medication_logs FOR SELECT USING (patient_id = auth.uid() OR EXISTS(SELECT 1 FROM medication_plans mp WHERE mp.id = plan_id AND mp.doctor_id = auth.uid()));
 CREATE POLICY "Patients update logs" ON medication_logs FOR UPDATE USING (patient_id = auth.uid());
 
+
+
+ALTER TABLE availability ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
+
+-- Availability Policies
+CREATE POLICY "Public can view availability" ON availability FOR SELECT USING (true);
+CREATE POLICY "Doctors update own availability" ON availability FOR ALL USING (auth.uid() = doctor_id);
+
+-- Invoices Policies
+CREATE POLICY "View own invoices" ON invoices FOR SELECT USING (doctor_id = auth.uid() OR patient_id = auth.uid());
+CREATE POLICY "Doctors create invoices" ON invoices FOR INSERT WITH CHECK (doctor_id = auth.uid());
+CREATE POLICY "Doctors update invoices" ON invoices FOR UPDATE USING (doctor_id = auth.uid());
