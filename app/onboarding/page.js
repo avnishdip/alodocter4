@@ -19,7 +19,7 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { registerDoctor } = useAuthStore();
+  const { registerDoctor, loginDoctor } = useAuthStore();
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,9 +63,16 @@ export default function OnboardingPage() {
       setStep(2);
     } catch (err) {
       if (err.message?.includes("verify your email")) {
-         setError("Success! Please check your email and click the verification link before continuing, then try logging in.");
-         // Note: Users can't actually proceed to step 2 until they click the email link and login again. 
-         // But we show the success message here.
+         setError("Success! Please check your email and click the verification link. Once verified, come back here and click 'Continue' again.");
+      } else if (err.message?.includes("already registered") || err.message?.includes("User already exists")) {
+         // If they already signed up but didn't finish onboarding, try to log them in and push to step 2
+         try {
+             await loginDoctor(email, password);
+             setStep(2);
+             setError("");
+         } catch (loginErr) {
+             setError(loginErr.message || "Registration failed. Try logging in directly.");
+         }
       } else {
          setError(err.message || "Registration failed");
       }

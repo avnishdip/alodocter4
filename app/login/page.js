@@ -46,7 +46,11 @@ export default function LoginPage() {
       await loginDoctor(email, password);
       router.push(redirectUrl || "/doctor/dashboard");
     } catch (err) {
-      setError(err.message || "Invalid email or password");
+      if (err.message?.includes("Profile incomplete")) {
+        router.push("/onboarding");
+      } else {
+        setError(err.message || "Invalid email or password");
+      }
     } finally {
       setLoading(false);
     }
