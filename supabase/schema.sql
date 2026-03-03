@@ -228,3 +228,27 @@ CREATE POLICY "Doctors update own availability" ON availability FOR ALL USING (a
 CREATE POLICY "View own invoices" ON invoices FOR SELECT USING (doctor_id = auth.uid() OR patient_id = auth.uid());
 CREATE POLICY "Doctors create invoices" ON invoices FOR INSERT WITH CHECK (doctor_id = auth.uid());
 CREATE POLICY "Doctors update invoices" ON invoices FOR UPDATE USING (doctor_id = auth.uid());
+
+
+-- SECURITY HOTFIX: Stricter Update/Insert Policies
+-- Previously, some tables allowed users to insert/update rows without strictly bounding all sensitive columns
+
+-- Appointments: Doctors and patients can view/update their own appointments.
+DROP POLICY IF EXISTS "Update own appointments" ON appointments;
+CREATE POLICY "Update own appointments" ON appointments FOR UPDATE USING (doctor_id = auth.uid() OR patient_id = auth.uid()) WITH CHECK (doctor_id = auth.uid() OR patient_id = auth.uid());
+
+-- Medication Plans: Only doctors should be able to update active status
+DROP POLICY IF EXISTS "Doctors can update meds" ON medication_plans;
+CREATE POLICY "Doctors can update meds" ON medication_plans FOR UPDATE USING (doctor_id = auth.uid()) WITH CHECK (doctor_id = auth.uid());
+
+-- Profiles: Ensure users can only update their own profile
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+-- Doctors: Ensure doctors can only update their own doctor info
+DROP POLICY IF EXISTS "Doctors can update their own info" ON doctors;
+CREATE POLICY "Doctors can update their own info" ON doctors FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+-- Doctor_Patients: Only doctors can delete relationships
+DROP POLICY IF EXISTS "Doctors can delete relationships" ON doctor_patients;
+CREATE POLICY "Doctors can delete relationships" ON doctor_patients FOR DELETE USING (doctor_id = auth.uid());
