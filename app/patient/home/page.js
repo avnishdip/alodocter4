@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { api } from "@/lib/api";
 import { CheckCircle, MinusCircle, Calendar, Clock } from "lucide-react";
@@ -36,6 +37,7 @@ function formatDateTime(dateStr) {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [plans, setPlans] = useState([]);
   const [logsMap, setLogsMap] = useState({});
@@ -177,10 +179,10 @@ export default function HomePage() {
 
       {/* Quick Actions */}
       <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
-         <button onClick={() => window.location.href='/patient/appointments/book'} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--primary-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+         <button onClick={() => router.push('/patient/appointments/book')} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--primary-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
             <Calendar size={18} /> Book Appointment
          </button>
-         <button onClick={() => window.location.href='/patient/medications'} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+         <button onClick={() => router.push('/patient/medications')} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
             <Clock size={18} /> Medication History
          </button>
       </div>

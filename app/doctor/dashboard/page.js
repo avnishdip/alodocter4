@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { api } from "@/lib/api";
 import { Users, CalendarDays, Activity, AlertTriangle, Clock, DollarSign } from "lucide-react";
@@ -43,6 +44,7 @@ function formatCurrency(amount) {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [patients, setPatients] = useState([]);
   const [appointments, setAppointments] = useState([]);
@@ -210,13 +212,13 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
-         <button onClick={() => window.location.href='/doctor/patients'} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--primary-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+         <button onClick={() => router.push('/doctor/patients')} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--primary-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
             <Users size={18} /> Invite New Patient
          </button>
-         <button onClick={() => window.location.href='/doctor/appointments'} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+         <button onClick={() => router.push('/doctor/appointments')} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
             <CalendarDays size={18} /> Schedule Appointment
          </button>
-         <button onClick={() => window.location.href='/doctor/invoices'} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--teal-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+         <button onClick={() => router.push('/doctor/invoices')} style={{ flex: 1, padding: 'var(--space-4)', backgroundColor: 'var(--teal-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
             <DollarSign size={18} /> Create Invoice
          </button>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import {
@@ -36,6 +37,7 @@ function formatTime(dateStr) {
 }
 
 export default function PatientDetailPage({ params }) {
+  const router = useRouter();
   const resolvedParams = use(params);
   const patientId = resolvedParams.id;
 
@@ -209,7 +211,7 @@ export default function PatientDetailPage({ params }) {
            <button onClick={() => setShowAddPlan(true)} style={{ padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--primary-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <Pill size={16} /> Prescribe
            </button>
-           <button onClick={() => window.location.href=`/doctor/appointments`} style={{ padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+           <button onClick={() => router.push('/doctor/appointments')} style={{ padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <CalendarDays size={16} /> Book Appt
            </button>
         </div>

@@ -58,7 +58,7 @@ export default function DoctorLayout({ children }) {
               <Link
                 key={href}
                 href={href}
-                className={`${styles.navLink} ${pathname === href ? styles.navLinkActive : ""}`}
+                className={`${styles.navLink} ${pathname === href || pathname.startsWith(href + "/") ? styles.navLinkActive : ""}`}
               >
                 <Icon size={18} />
                 <span>{label}</span>
