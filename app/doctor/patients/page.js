@@ -181,12 +181,12 @@ export default function PatientsPage() {
                   <td>{patient.phone || "—"}</td>
                   <td>
                     <div className={styles.conditionTags}>
-                      {(patient.conditions || []).map((c, i) => (
+                      {(typeof patient.conditions === 'string' ? patient.conditions.split(',').map(s => s.trim()).filter(Boolean) : patient.conditions || []).map((c, i) => (
                         <span key={i} className={styles.conditionTag}>
                           {c}
                         </span>
                       ))}
-                      {(!patient.conditions || patient.conditions.length === 0) && "—"}
+                      {(!(typeof patient.conditions === 'string' ? patient.conditions.split(',').map(s => s.trim()).filter(Boolean) : patient.conditions || []).length) && "—"}
                     </div>
                   </td>
                   <td>

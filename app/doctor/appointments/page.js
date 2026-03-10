@@ -230,7 +230,7 @@ export default function AppointmentsPage() {
                   </td>
                   <td>{formatDate(apt.datetime)}</td>
                   <td>{formatTime(apt.datetime)}</td>
-                  <td>{(apt.appointment_type || "clinic_visit").replace(/_/g, " ")}</td>
+                  <td>{(apt.type || "clinic_visit").replace(/_/g, " ")}</td>
                   <td>
                     <StatusBadge status={apt.status || "booked"} />
                   </td>

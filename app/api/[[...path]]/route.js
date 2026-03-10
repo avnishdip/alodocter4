@@ -80,7 +80,8 @@ export async function GET(request, { params }) {
       if (!doctorId || !dateStr) return NextResponse.json({ slots: [] });
 
       const dateObj = new Date(dateStr);
-      const dayOfWeek = dateObj.getDay(); // 0 is Sunday, 1 is Monday
+      const jsDay = dateObj.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+      const dayOfWeek = jsDay === 0 ? 6 : jsDay - 1; // Convert to DB convention: 0=Monday, ..., 6=Sunday
       
       // Fetch availability for that day
       const { data: avail } = await supabase.from("availability").select("*").eq("doctor_id", doctorId).eq("day_of_week", dayOfWeek).single();
@@ -305,7 +306,7 @@ export async function PUT(request, { params }) {
   try {
     if (path === "doctors/me") {
       await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name }).eq("id", user.id);
-      const { data } = await supabase.from("doctors").update({ specialty: body.specialty, bio: body.bio, fee: body.fee }).eq("id", user.id).select().single() || {};
+      const { data } = await supabase.from("doctors").update({ specialty: body.specialty, bio: body.bio, fee: body.fee, is_public: body.is_public, invoice_name: body.invoice_name, invoice_address: body.invoice_address, invoice_brn: body.invoice_brn, invoice_tan: body.invoice_tan, invoice_instructions: body.invoice_instructions }).eq("id", user.id).select().single() || {};
       return NextResponse.json(data);
     }
     
