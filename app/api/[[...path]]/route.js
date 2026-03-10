@@ -205,6 +205,34 @@ export async function POST(request, { params }) {
       if (!user) return NextResponse.json({}, { status: 401 });
       await supabase.from("profiles").update({ first_name: body.first_name, last_name: body.last_name }).eq("id", user.id);
       await supabase.from("patients").update({ date_of_birth: body.date_of_birth || "1990-01-01" }).eq("id", user.id);
+
+      // Auto-link patient to doctor if there's a pending invite for this phone
+      const userPhone = user.phone;
+      if (userPhone) {
+        const normalizedPhone = userPhone.startsWith('+') ? userPhone : `+230${userPhone}`;
+        const { data: invite } = await supabase
+          .from('pending_invites')
+          .select('*')
+          .eq('phone', normalizedPhone)
+          .single();
+
+        if (invite) {
+          // Link patient to doctor
+          await supabase.from('doctor_patients').upsert({
+            doctor_id: invite.doctor_id,
+            patient_id: user.id
+          });
+          // Delete the pending invite
+          await supabase.from('pending_invites').delete().eq('id', invite.id);
+          // Pre-fill patient conditions from invite if present
+          if (invite.conditions) {
+            await supabase.from('patients').update({
+              medical_conditions: invite.conditions
+            }).eq('id', user.id);
+          }
+        }
+      }
+
       return NextResponse.json({ role: "patient", user: { id: user.id, phone: user.phone }});
     }
 
