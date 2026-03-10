@@ -188,7 +188,7 @@ export async function POST(request, { params }) {
     if (path === "patients/invite") {
       const token = Math.random().toString(36).substring(2, 10);
       let p_phone = body.phone.startsWith("+") ? body.phone : `+230${body.phone}`;
-      const { data, error } = await supabase.from("pending_invites").upsert({
+      const { error } = await supabase.from("pending_invites").upsert({
         doctor_id: user.id,
         phone: p_phone,
         first_name: body.first_name,
@@ -404,7 +404,7 @@ export async function PATCH(request, { params }) {
    }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(_request, { params }) {
   const p = await params;
   const pathArray = p.path || [];
   const path = pathArray.join("/");

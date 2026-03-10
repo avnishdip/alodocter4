@@ -14,7 +14,6 @@ import {
   Flame,
   CheckCircle2,
   XCircle,
-  SkipForward,
 } from "lucide-react";
 import styles from "./page.module.css";
 

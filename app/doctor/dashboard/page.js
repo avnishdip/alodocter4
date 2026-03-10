@@ -132,8 +132,7 @@ export default function DashboardPage() {
   );
 
   const totalPatients = patients.length;
-  const todayCount = todayAppointments.length;
-  
+
   // Compute total revenue from paid invoices
   const totalRevenue = invoices.reduce((acc, inv) => {
     return inv.status === "paid" ? acc + Number(inv.amount || 0) : acc;
