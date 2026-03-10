@@ -199,6 +199,7 @@ CREATE POLICY "Patients view own info" ON patients FOR SELECT USING (auth.uid() 
 CREATE POLICY "Doctors view assigned patients" ON patients FOR SELECT USING (
   EXISTS (SELECT 1 FROM doctor_patients dp WHERE dp.patient_id = patients.id AND dp.doctor_id = auth.uid())
 );
+CREATE POLICY "patients_update_own" ON patients FOR UPDATE USING (auth.uid() = id);
 
 -- Doctor_Patients: Both doctors and patients can view their relationships.
 CREATE POLICY "View own relationships" ON doctor_patients FOR SELECT USING (doctor_id = auth.uid() OR patient_id = auth.uid());
@@ -213,6 +214,7 @@ CREATE POLICY "Update own appointments" ON appointments FOR UPDATE USING (doctor
 CREATE POLICY "View own meds" ON medication_plans FOR SELECT USING (doctor_id = auth.uid() OR patient_id = auth.uid());
 CREATE POLICY "Doctors can create meds" ON medication_plans FOR INSERT WITH CHECK (doctor_id = auth.uid());
 CREATE POLICY "View own logs" ON medication_logs FOR SELECT USING (patient_id = auth.uid() OR EXISTS(SELECT 1 FROM medication_plans mp WHERE mp.id = plan_id AND mp.doctor_id = auth.uid()));
+CREATE POLICY "medication_logs_insert_own" ON medication_logs FOR INSERT WITH CHECK (auth.uid() = patient_id);
 CREATE POLICY "Patients update logs" ON medication_logs FOR UPDATE USING (patient_id = auth.uid());
 
 
