@@ -187,6 +187,8 @@ export async function POST(request, { params }) {
 
 
     if (path === "patients/invite") {
+      if (!user) return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
+      if (!body.phone) return NextResponse.json({ detail: "Phone is required" }, { status: 400 });
       const token = Math.random().toString(36).substring(2, 10);
       let p_phone = body.phone.startsWith("+") ? body.phone : `+230${body.phone}`;
       const { error } = await supabase.from("pending_invites").upsert({
@@ -373,7 +375,9 @@ export async function PATCH(request, { params }) {
    try {
      const body = await request.json().catch(() => ({}));
      if (path.startsWith("appointments/") && p.path.length === 2) {
-       const { data } = await supabase.from("appointments").update(body).eq("id", p.path[1]).select().single();
+       const allowedFields = { status: body.status, notes: body.notes, type: body.type };
+       const updateFields = Object.fromEntries(Object.entries(allowedFields).filter(([, v]) => v !== undefined));
+       const { data } = await supabase.from("appointments").update(updateFields).eq("id", p.path[1]).or(`doctor_id.eq.${user.id},patient_id.eq.${user.id}`).select().single();
        return NextResponse.json(data);
      }
 
