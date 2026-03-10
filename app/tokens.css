@@ -26,14 +26,54 @@
 
   /* Colors — Semantic */
   --green-50: #F0FDF4;
+  --green-100: #DCFCE7;
   --green-500: #22C55E;
   --green-600: #16A34A;
+  --green-700: #15803D;
   --red-50: #FEF2F2;
   --red-500: #EF4444;
   --red-600: #DC2626;
   --amber-50: #FFFBEB;
+  --amber-100: #FEF3C7;
   --amber-500: #F59E0B;
   --amber-600: #D97706;
+  --amber-800: #92400E;
+  --blue-50: #EFF6FF;
+  --blue-600: #2563EB;
+  --teal-600: #0D9488;
+
+  /* Semantic aliases — Layout & Surface */
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+  --surface-bg: #F4F6F8;
+
+  /* Semantic aliases — Primary brand */
+  --primary: var(--primary-500);
+  --primary-default: var(--primary-600);
+  --primary-hover: var(--primary-700);
+  --primary-foreground: var(--white);
+  --primary-rgb: 59, 130, 246;
+
+  /* Semantic aliases — Text */
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-500);
+
+  /* Semantic aliases — Buttons */
+  --button-primary-hover: var(--primary-700);
+  --button-secondary-border: var(--gray-300);
+  --button-secondary-hover: var(--gray-100);
+
+  /* Semantic aliases — Status */
+  --success-default: #10B981;
+
+  /* Semantic aliases — Typography */
+  --font-geist-sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Semantic aliases — Spacing (spacing-N = space-N) */
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
