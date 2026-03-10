@@ -163,7 +163,8 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({ detail: "Not found: " + path }, { status: 404 });
   } catch (err) {
-    return NextResponse.json({ detail: err.message }, { status: 500 });
+    console.error('[API Error]', path, err.message);
+    return NextResponse.json({ detail: 'An error occurred' }, { status: 500 });
   }
 }
 
@@ -318,7 +319,8 @@ export async function POST(request, { params }) {
 
     return NextResponse.json({ detail: "Not found POST: " + path }, { status: 404 });
   } catch (err) {
-    return NextResponse.json({ detail: err.message }, { status: 500 });
+    console.error('[API Error]', path, err.message);
+    return NextResponse.json({ detail: 'An error occurred' }, { status: 500 });
   }
 }
 
@@ -356,7 +358,8 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json({ detail: "Not found PUT" }, { status: 404 });
   } catch (err) {
-    return NextResponse.json({ detail: err.message }, { status: 500 });
+    console.error('[API Error]', path, err.message);
+    return NextResponse.json({ detail: 'An error occurred' }, { status: 500 });
   }
 }
 
@@ -400,7 +403,8 @@ export async function PATCH(request, { params }) {
 
      return NextResponse.json({}, { status: 404 });
    } catch (err) {
-     return NextResponse.json({ detail: err.message }, { status: 500 });
+     console.error('[API Error]', path, err.message);
+     return NextResponse.json({ detail: 'An error occurred' }, { status: 500 });
    }
 }
 
@@ -422,6 +426,7 @@ export async function DELETE(_request, { params }) {
 
     return NextResponse.json({ detail: "Not found DELETE: " + path }, { status: 404 });
   } catch (err) {
-    return NextResponse.json({ detail: err.message }, { status: 500 });
+    console.error('[API Error]', path, err.message);
+    return NextResponse.json({ detail: 'An error occurred' }, { status: 500 });
   }
 }
