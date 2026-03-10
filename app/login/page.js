@@ -176,6 +176,11 @@ export default function LoginPage() {
         )}
 
         <div className={styles.footer}>
+          {activeTab === "doctor" && (
+            <p style={{ marginBottom: "var(--space-3)" }}>
+              <Link href="/forgot-password" className={styles.link}>Forgot password?</Link>
+            </p>
+          )}
           <p>
             New practitioner?{" "}
             <Link href="/onboarding" className={styles.link}>Request Platform Access</Link>
