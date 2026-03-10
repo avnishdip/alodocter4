@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { Search, MapPin, Star, ChevronRight } from "lucide-react";
+import { Search, ChevronRight } from "lucide-react";
 import styles from "./page.module.css";
 
 export default function SearchPage() {

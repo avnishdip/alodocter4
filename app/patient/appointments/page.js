@@ -25,24 +25,6 @@ function formatTime(dateStr) {
   });
 }
 
-function getStatusClass(status) {
-  switch (status) {
-    case "completed":
-      return styles.statusCompleted;
-    case "cancelled":
-      return styles.statusCancelled;
-    case "confirmed":
-      return styles.statusConfirmed;
-    default:
-      return styles.statusScheduled;
-  }
-}
-
-function getStatusLabel(status) {
-  if (!status) return "Scheduled";
-  return status.charAt(0).toUpperCase() + status.slice(1);
-}
-
 export default function AppointmentsPage() {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [appointments, setAppointments] = useState([]);

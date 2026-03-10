@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { MapPin, Calendar, Clock, ChevronLeft } from "lucide-react";
+import { Calendar, Clock, ChevronLeft } from "lucide-react";
 import styles from "./page.module.css";
 import { useAuthStore } from "@/lib/stores/authStore";
 
