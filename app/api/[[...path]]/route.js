@@ -140,7 +140,14 @@ export async function GET(request, { params }) {
     }
 
     if (path.startsWith("medications/compliance/")) {
-      return NextResponse.json({ score: 85, total_prescriptions: 2 });
+      const patientId = pathArray[2];
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: logs } = await supabase.from("medication_logs").select("status").eq("patient_id", patientId).gte("created_at", thirtyDaysAgo);
+      const total = logs?.length || 0;
+      const taken = logs?.filter(l => l.status === "taken").length || 0;
+      const score = total === 0 ? 100 : Math.round((taken / total) * 100);
+      const { count: totalPrescriptions } = await supabase.from("medication_plans").select("id", { count: "exact", head: true }).eq("patient_id", patientId);
+      return NextResponse.json({ score, taken, total, total_prescriptions: totalPrescriptions || 0 });
     }
 
     if (path === "invoices" || path === "invoices/") {
@@ -266,6 +273,20 @@ export async function POST(request, { params }) {
       return NextResponse.json(data);
     }
 
+    if (path === "invoices" || path === "invoices/") {
+      const { data, error } = await supabase.from("invoices").insert({
+        doctor_id: user.id,
+        patient_id: body.patient_id,
+        amount: body.amount,
+        description: body.description || body.notes,
+        status: "unpaid",
+        due_date: body.due_date,
+        appointment_id: body.appointment_id || null
+      }).select().single();
+      if (error) throw error;
+      return NextResponse.json(data);
+    }
+
     return NextResponse.json({ detail: "Not found POST: " + path }, { status: 404 });
   } catch (err) {
     return NextResponse.json({ detail: err.message }, { status: 500 });
@@ -316,15 +337,62 @@ export async function PATCH(request, { params }) {
    const supabase = await createClient();
    const { data: { user } } = await supabase.auth.getUser();
    if (!user) return NextResponse.json({}, { status: 401 });
-   
+
    try {
      const body = await request.json().catch(() => ({}));
      if (path.startsWith("appointments/") && p.path.length === 2) {
        const { data } = await supabase.from("appointments").update(body).eq("id", p.path[1]).select().single();
        return NextResponse.json(data);
      }
+
+     if (path.startsWith("invoices/") && p.path.length === 2) {
+       const invoiceId = p.path[1];
+       const updateFields = {};
+       if (body.status !== undefined) updateFields.status = body.status;
+       if (body.status === "paid") updateFields.paid_at = new Date().toISOString();
+       const { data, error } = await supabase.from("invoices").update(updateFields).eq("id", invoiceId).eq("doctor_id", user.id).select().single();
+       if (error) throw error;
+       return NextResponse.json(data);
+     }
+
+     if (path.startsWith("medications/plans/") && p.path.length === 3) {
+       const planId = p.path[2];
+       const updateFields = {};
+       if (body.name !== undefined) updateFields.name = body.name;
+       if (body.dosage !== undefined) updateFields.dosage = body.dosage;
+       if (body.frequency !== undefined) updateFields.frequency = body.frequency;
+       if (body.schedule !== undefined) updateFields.schedule = body.schedule;
+       if (body.is_active !== undefined) updateFields.is_active = body.is_active;
+       if (body.times_per_day !== undefined) updateFields.times_per_day = body.times_per_day;
+       const { data, error } = await supabase.from("medication_plans").update(updateFields).eq("id", planId).eq("doctor_id", user.id).select().single();
+       if (error) throw error;
+       return NextResponse.json(data);
+     }
+
      return NextResponse.json({}, { status: 404 });
    } catch (err) {
      return NextResponse.json({ detail: err.message }, { status: 500 });
    }
+}
+
+export async function DELETE(request, { params }) {
+  const p = await params;
+  const pathArray = p.path || [];
+  const path = pathArray.join("/");
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
+
+  try {
+    if (path.startsWith("medications/plans/") && pathArray.length === 3) {
+      const planId = pathArray[2];
+      const { error } = await supabase.from("medication_plans").delete().eq("id", planId).eq("doctor_id", user.id);
+      if (error) throw error;
+      return NextResponse.json({ success: true });
+    }
+
+    return NextResponse.json({ detail: "Not found DELETE: " + path }, { status: 404 });
+  } catch (err) {
+    return NextResponse.json({ detail: err.message }, { status: 500 });
+  }
 }
