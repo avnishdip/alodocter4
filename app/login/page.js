@@ -119,6 +119,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="dr.name@clinic.mu"
+                aria-label="Work Email"
                 required
               />
             </div>
@@ -130,6 +131,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter secure password"
+                aria-label="Password"
                 required
               />
             </div>
@@ -148,6 +150,7 @@ export default function LoginPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="5XXX XXXX"
+                  aria-label="Phone Number"
                   required
                 />
               </div>
@@ -165,6 +168,7 @@ export default function LoginPage() {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="6-digit code"
+                  aria-label="Verification Code"
                   required
                 />
               </div>

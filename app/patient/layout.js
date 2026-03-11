@@ -42,18 +42,22 @@ export default function PatientLayout({ children }) {
 
   return (
     <div className={styles.layout}>
-      <main className={styles.main}>{children}</main>
-      <nav className={styles.bottomNav}>
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`${styles.navItem} ${pathname === href || pathname.startsWith(href + "/") ? styles.navItemActive : ""}`}
-          >
-            <Icon size={22} />
-            <span>{label}</span>
-          </Link>
-        ))}
+      <main className={styles.main} role="main">{children}</main>
+      <nav className={styles.bottomNav} role="navigation" aria-label="Main navigation">
+        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+              {...(isActive ? { "aria-current": "page" } : {})}
+            >
+              <Icon size={22} />
+              <span>{label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );

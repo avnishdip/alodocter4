@@ -208,11 +208,11 @@ export default function PatientsPage() {
       </div>
 
       {showInvite && (
-        <div className={styles.overlay} onClick={() => { setShowInvite(false); setInviteLink(""); setCopied(false); }}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.overlay} onClick={() => { setShowInvite(false); setInviteLink(""); setCopied(false); }} onKeyDown={(e) => { if (e.key === "Escape") { setShowInvite(false); setInviteLink(""); setCopied(false); } }}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
             {inviteLink ? (
               <>
-                <h2 className={styles.modalTitle}>Invite Sent</h2>
+                <h2 className={styles.modalTitle} id="invite-modal-title">Invite Sent</h2>
                 <p className={styles.inviteMessage}>
                   Share this link with your patient so they can create their account:
                 </p>
@@ -252,7 +252,7 @@ export default function PatientsPage() {
               </>
             ) : (
               <>
-                <h2 className={styles.modalTitle}>Invite Patient</h2>
+                <h2 className={styles.modalTitle} id="invite-modal-title">Invite Patient</h2>
                 <form className={styles.form} onSubmit={handleInvite}>
                   <div className={styles.field}>
                     <label className={styles.label}>First Name</label>

@@ -53,17 +53,21 @@ export default function DoctorLayout({ children }) {
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <span className={styles.logo}>Alo Doctor</span>
-          <nav className={styles.nav}>
-            {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`${styles.navLink} ${pathname === href || pathname.startsWith(href + "/") ? styles.navLinkActive : ""}`}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </Link>
-            ))}
+          <nav className={styles.nav} role="navigation" aria-label="Main navigation">
+            {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+              const isActive = pathname === href || pathname.startsWith(href + "/");
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`${styles.navLink} ${isActive ? styles.navLinkActive : ""}`}
+                  {...(isActive ? { "aria-current": "page" } : {})}
+                >
+                  <Icon size={18} />
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
           </nav>
           <div className={styles.headerRight}>
             <Link href="/doctor/profile" className={styles.profileLink}>
@@ -76,7 +80,23 @@ export default function DoctorLayout({ children }) {
           </div>
         </div>
       </header>
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main} role="main">{children}</main>
+      <nav className={styles.bottomNav} role="navigation" aria-label="Main navigation">
+        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`${styles.bottomNavItem} ${isActive ? styles.bottomNavItemActive : ""}`}
+              {...(isActive ? { "aria-current": "page" } : {})}
+            >
+              <Icon size={22} />
+              <span>{label === "Medications" ? "Meds" : label === "Appointments" ? "Appts" : label === "Availability" ? "Avail" : label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

@@ -221,16 +221,16 @@ export default function PatientDetailPage({ params }) {
         <div className={styles.statCard}>
           <div className={styles.statValue}>
             <Activity size={18} style={{ verticalAlign: "middle", marginRight: 4 }} />
-            {compliance ? `${compliance.adherence_percentage}%` : "—"}
+            {compliance && compliance.score != null ? `${compliance.score}%` : "No data"}
           </div>
           <div className={styles.statLabel}>Adherence</div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statValue}>
             <Flame size={18} style={{ verticalAlign: "middle", marginRight: 4 }} />
-            {compliance ? compliance.current_streak || 0 : "—"}
+            {compliance ? compliance.total_prescriptions || 0 : "—"}
           </div>
-          <div className={styles.statLabel}>Day Streak</div>
+          <div className={styles.statLabel}>Prescriptions</div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statValue}>
@@ -238,7 +238,7 @@ export default function PatientDetailPage({ params }) {
               size={18}
               style={{ verticalAlign: "middle", marginRight: 4, color: "var(--green-500)" }}
             />
-            {compliance ? compliance.taken_count || 0 : "—"}
+            {compliance ? compliance.taken || 0 : "—"}
           </div>
           <div className={styles.statLabel}>Taken</div>
         </div>
@@ -248,11 +248,83 @@ export default function PatientDetailPage({ params }) {
               size={18}
               style={{ verticalAlign: "middle", marginRight: 4, color: "var(--red-500)" }}
             />
-            {compliance ? compliance.missed_count || 0 : "—"}
+            {compliance ? (compliance.total || 0) - (compliance.taken || 0) : "—"}
           </div>
           <div className={styles.statLabel}>Missed</div>
         </div>
       </div>
+
+      {/* Compliance progress bar */}
+      {(() => {
+        const score = compliance ? compliance.score : null;
+        const barColor =
+          score == null
+            ? "var(--gray-300)"
+            : score > 80
+            ? "var(--green-500)"
+            : score >= 50
+            ? "var(--amber-500)"
+            : "var(--red-500)";
+        const barWidth = score == null ? 100 : score;
+        return (
+          <div
+            style={{
+              background: "var(--white)",
+              borderRadius: "var(--radius-lg)",
+              padding: "var(--space-6) var(--space-8)",
+              boxShadow: "var(--shadow-sm)",
+              marginBottom: "var(--space-6)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "var(--space-3)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "var(--text-sm)",
+                  fontWeight: "var(--font-semibold)",
+                  color: "var(--gray-900)",
+                }}
+              >
+                Compliance Score
+              </span>
+              <span
+                style={{
+                  fontSize: "var(--text-sm)",
+                  fontWeight: "var(--font-bold)",
+                  color: score == null ? "var(--gray-400)" : barColor,
+                }}
+              >
+                {score == null ? "No data" : `${score}%`}
+              </span>
+            </div>
+            <div
+              style={{
+                width: "100%",
+                height: 12,
+                backgroundColor: "var(--gray-100)",
+                borderRadius: "var(--radius-full)",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  width: `${barWidth}%`,
+                  height: "100%",
+                  backgroundColor: barColor,
+                  borderRadius: "var(--radius-full)",
+                  transition: "width 0.4s ease",
+                }}
+              />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Sections */}
       <div className={styles.sections}>
@@ -340,9 +412,9 @@ export default function PatientDetailPage({ params }) {
 
       {/* Add Plan Modal */}
       {showAddPlan && (
-        <div className={styles.overlay} onClick={() => setShowAddPlan(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>Add Medication Plan</h2>
+        <div className={styles.overlay} onClick={() => setShowAddPlan(false)} onKeyDown={(e) => { if (e.key === "Escape") setShowAddPlan(false); }}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="add-plan-modal-title">
+            <h2 className={styles.modalTitle} id="add-plan-modal-title">Add Medication Plan</h2>
             <form className={styles.form} onSubmit={handleAddPlan}>
               <div className={styles.field}>
                 <label className={styles.label}>Medication Name</label>

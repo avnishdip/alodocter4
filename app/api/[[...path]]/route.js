@@ -146,7 +146,7 @@ export async function GET(request, { params }) {
       const { data: logs } = await supabase.from("medication_logs").select("status").eq("patient_id", patientId).gte("created_at", thirtyDaysAgo);
       const total = logs?.length || 0;
       const taken = logs?.filter(l => l.status === "taken").length || 0;
-      const score = total === 0 ? 100 : Math.round((taken / total) * 100);
+      const score = total === 0 ? null : Math.round((taken / total) * 100);
       const { count: totalPrescriptions } = await supabase.from("medication_plans").select("id", { count: "exact", head: true }).eq("patient_id", patientId);
       return NextResponse.json({ score, taken, total, total_prescriptions: totalPrescriptions || 0 });
     }

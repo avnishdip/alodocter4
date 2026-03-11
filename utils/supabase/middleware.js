@@ -33,24 +33,51 @@ export async function updateSession(request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Basic route protection
+  const pathname = request.nextUrl.pathname;
+
+  // Basic route protection — redirect unauthenticated users to login
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/join") &&
-    !request.nextUrl.pathname.startsWith("/auth") &&
-    !request.nextUrl.pathname.startsWith("/onboarding") &&
-    !request.nextUrl.pathname.startsWith("/api") &&
-    !request.nextUrl.pathname.startsWith("/search") &&
-    !request.nextUrl.pathname.startsWith("/d") &&
-    !request.nextUrl.pathname.startsWith("/terms") &&
-    !request.nextUrl.pathname.startsWith("/privacy") &&
-    !request.nextUrl.pathname.startsWith("/verification-complete") &&
-    request.nextUrl.pathname !== "/"
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/join") &&
+    !pathname.startsWith("/auth") &&
+    !pathname.startsWith("/onboarding") &&
+    !pathname.startsWith("/api") &&
+    !pathname.startsWith("/search") &&
+    !pathname.startsWith("/d") &&
+    !pathname.startsWith("/terms") &&
+    !pathname.startsWith("/privacy") &&
+    !pathname.startsWith("/forgot-password") &&
+    !pathname.startsWith("/reset-password") &&
+    !pathname.startsWith("/verification-complete") &&
+    pathname !== "/"
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // Role enforcement — prevent cross-role access to protected routes
+  if (user && (pathname.startsWith("/doctor") || pathname.startsWith("/patient"))) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role) {
+      const url = request.nextUrl.clone();
+
+      if (pathname.startsWith("/doctor") && profile.role !== "doctor") {
+        url.pathname = "/patient/home";
+        return NextResponse.redirect(url);
+      }
+
+      if (pathname.startsWith("/patient") && profile.role !== "patient") {
+        url.pathname = "/doctor/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   return supabaseResponse;
